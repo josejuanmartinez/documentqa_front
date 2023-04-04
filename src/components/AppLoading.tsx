@@ -12,7 +12,7 @@ export function AppLoading() {
       }}
     >
       <div>
-        First time installation. Please, wait...
+        Waiting until server is up and running...
         <LinearProgress style={{ marginTop: 12 }} />
       </div>
     </Container>

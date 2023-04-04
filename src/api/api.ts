@@ -1,18 +1,14 @@
 import { dummyResponse } from '../constants/test';
 import { Block } from '../types/Block';
-import { SERVER_URL } from '../constants/consts'
+import { SERVER_URL } from '../constants/const'
 
 export async function checkApiStatus() {
   try {
-    const res = await fetch(`${SERVER_URL}`, {
+    const res = await fetch(`${SERVER_URL}/healthcheck`, {
       method: 'GET',
     });
-    const json = await res.json();
-    console.log('JSON', json);
-    if (json.result === 'Server running') {
-      return true;
-    }
-    return false;
+    return res.status == 200
+
   } catch (e) {
     return false;
   }

@@ -2,6 +2,7 @@ import { Box, Button, CircularProgress, Container } from '@mui/material';
 import { ChangeEvent, useState } from 'react';
 import { getDocumentInformation } from './api/api';
 import { DocumentPreview } from './components/DocumentPreview';
+import SearchAppBar from './components/SearchBar';
 import { Block } from './types/Block';
 
 function App() {
@@ -37,9 +38,7 @@ function App() {
         minHeight: '100vh',
       }}
     >
-      <nav style={{ padding: 20 }}>
-        <div>John Snow Labs</div>
-      </nav>
+      <SearchAppBar></SearchAppBar>
       <Container
         style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}
       >
@@ -52,7 +51,7 @@ function App() {
         >
           <div>
             <Button variant="outlined" component="label">
-              Choose file
+              Upload a file
               <input type="file" hidden onChange={handleFileChange} />
             </Button>
             <div>{file ? `${file.name} - ${file.type}` : 'No file chosen'}</div>
