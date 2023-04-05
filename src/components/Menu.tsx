@@ -3,19 +3,19 @@ import Button from '@mui/joy/Button';
 import Menu from '@mui/joy/Menu';
 import MenuItem from '@mui/joy/MenuItem';
 import Apps from '@mui/icons-material/Apps';
+import {NO_SCREEN, UPLOAD} from "../constants/const";
 
-export default function SelectedMenu() {
+export default function SelectedMenu({changeScreen}: {changeScreen: (index: number) => any}) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [selectedIndex, setSelectedIndex] = React.useState<number>(1);
+    const [selectedIndex, setSelectedIndex] = React.useState<number>(NO_SCREEN);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
     const createHandleClose = (index: number) => () => {
         setAnchorEl(null);
-        if (typeof index === 'number') {
-            setSelectedIndex(index);
-        }
+        setSelectedIndex(index);
+        changeScreen(index);
     };
 
     return (
@@ -40,15 +40,15 @@ export default function SelectedMenu() {
             >
                 <MenuItem
                     {...(selectedIndex === 0 && { selected: true, variant: 'soft' })}
-                    onClick={createHandleClose(0)}
+                    onClick={createHandleClose(NO_SCREEN)}
                 >
-                    Index a PDF file
+                    Main
                 </MenuItem>
                 <MenuItem
                     {...(selectedIndex === 1 && { selected: true, variant: 'soft' })}
-                    onClick={createHandleClose(1)}
+                    onClick={createHandleClose(UPLOAD)}
                 >
-                    Index a text file
+                    Index a file
                 </MenuItem>
             </Menu>
         </div>

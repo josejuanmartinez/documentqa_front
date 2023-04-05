@@ -16,7 +16,7 @@ const Search = styled('div')(({ theme }) => ({
         backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     marginLeft: 0,
-    width: '100%',
+    width: '200%',
     [theme.breakpoints.up('sm')]: {
         marginLeft: theme.spacing(1),
         width: 'auto',
@@ -42,20 +42,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: '12ch',
+            width: '20ch',
             '&:focus': {
-                width: '20ch',
+                width: '75ch',
             },
         },
     },
 }));
 
-export default function SearchAppBar() {
+export default function SearchAppBar({changeScreen}: {changeScreen: (index: number) => any}) {
+
     return (
         <Box sx={{ flexGrow: 1 }}>
     <AppBar position="static">
     <Toolbar>
-        <SelectedMenu/>
+        <SelectedMenu changeScreen={changeScreen}/>
     <Typography
     variant="h6"
     noWrap

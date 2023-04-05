@@ -8,8 +8,10 @@ import { LoaderApp } from './LoaderApp';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <LoaderApp fallback={<AppLoading />}>
-      <App />
-    </LoaderApp>
+      {/*<ThemeProvider theme={custom_theme_1}>*/}
+        <LoaderApp fallback={<AppLoading />}>
+          <App />
+        </LoaderApp>
+      {/*</ThemeProvider>*/}
   </React.StrictMode>,
 );

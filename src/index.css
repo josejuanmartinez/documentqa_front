@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* color-scheme: light dark; */
+  color-scheme: light;
   /* color: rgba(255, 255, 255, 0.87);
   background-color: #242424; */
 
@@ -59,6 +59,55 @@
   font-weight: bold;
 }
 
+.MuiPaper-root {
+  background-color: #101010 !important;
+}
+
 .MuiSvgIcon-root {
   fill: white !important;
+}
+
+.allApp {
+  flex: 1;
+}
+
+.uploadBox {
+  justify-content: space-between;
+  flex-direction: row;
+  display: flex;
+  margin-top: 10px;
+  background-color: transparent;
+}
+
+.resultTab {
+  background-color: transparent;
+  flex-grow: 1;
+}
+
+.extractTxt {
+  margin-left: 25px;
+  margin-top: 1px;
+}
+
+.extractTxtBold {
+  margin-left: 5px;
+  margin-top: 1px;
+  font-weight: bold;
+}
+
+.MuiCheckbox-label {
+  font-size: small;
+}
+
+.divider {
+  margin-left: 10px !important;
+}
+
+.dividerText {
+  min-width: 110px;
+}
+
+.uploadParam {
+  width:275px;
+  margin-left: 25px;
 }
