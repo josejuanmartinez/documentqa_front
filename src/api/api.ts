@@ -1,6 +1,5 @@
-import { dummyResponse } from '../constants/test';
 import { Block } from '../types/Block';
-import { SERVER_URL } from '../constants/const'
+import {FORM_VALIDATION_ERROR, INDEX_FILE_ERROR, SERVER_URL} from '../constants/const'
 
 export async function checkApiStatus() {
   try {
@@ -14,19 +13,49 @@ export async function checkApiStatus() {
   }
 }
 
-export async function getDocumentInformation(
+export async function ProcessDocument(
   formData: FormData,
-): Promise<{ status?: 'OK'; result: Block[] }> {
+): Promise<{ code: number, message: string, result: string}> {
   console.log('Form data', formData.keys());
+
+  let stringFiletype: any = "application/pdf";
+  let isTxt = false;
+  let endpoint: string = "process_pdf"
+  if (!formData.has("file")) {
+    return { code: FORM_VALIDATION_ERROR, message: 'File not found in form', result: ''};
+  }
+  if (!formData.has("filename")) {
+    return { code: FORM_VALIDATION_ERROR, message: 'Filename not found in form', result: ''};
+  }
+  if (!formData.has("filetype")) {
+    return { code: FORM_VALIDATION_ERROR, message: 'File type not found in form', result: ''};
+  } else {
+    const filetype: any = formData.get("filetype");
+    stringFiletype = filetype.toString();
+    if (stringFiletype == "application/text" || stringFiletype == "text/plain") {
+      isTxt = true;
+    }
+  }
+  if (formData.has("extract_text")) {
+    const extractText: any = formData.get("extract_text");
+    if (extractText.toLowerCase() == "true") {
+      isTxt = true;
+    }
+  }
+
+  if(isTxt) {
+    endpoint = "process_text";
+  }
+
   try {
-    const response = await fetch(`${SERVER_URL}/sentence-highlighting`, {
+    const response = await fetch(`${SERVER_URL}/${endpoint}`, {
       method: 'POST',
       body: formData,
     });
-    const json = await response.json();
-    return json;
+    const result = await response.json();
+    return { code: result['code'], message: result['message'], result: result['result']};
   } catch (e) {
     console.log('Error', e);
-    return { status: 'OK', result: dummyResponse };
+    return { code: INDEX_FILE_ERROR, message: e.message, result: ''};
   }
 }
