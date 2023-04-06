@@ -1,4 +1,3 @@
-import { Block } from '../types/Block';
 import {FORM_VALIDATION_ERROR, INDEX_FILE_ERROR, SERVER_URL} from '../constants/const'
 
 export async function checkApiStatus() {

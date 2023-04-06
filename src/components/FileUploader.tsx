@@ -1,9 +1,11 @@
 import {Box, Button, CircularProgress} from "@mui/material";
-// import {Block} from "../types/Block";
+import {Block} from "../types/Block";
 import {ProcessDocument} from "../api/api";
 import {ChangeEvent, Fragment, useState} from "react";
 import {Checkbox, Divider, Input, Select, Option} from "@mui/joy";
-import {SEPARATORS} from "../constants/const";
+import {OK, SEPARATORS} from "../constants/const";
+import Notify from "../utils/notifications";
+import {toast} from "react-toastify";
 
 export default function FileUploader() {
     const defaultSeparator: string = "line";
@@ -20,7 +22,7 @@ export default function FileUploader() {
     const [separator, setSeparator] = useState<any>(defaultSeparator);
     const [chunkSize, setChunkSize] = useState<any>(defaultChunkSize);
     const [chunkOverlap, setChunkOverlap] = useState<any>(defaultChunkOverlap);
-    //const [response, setResponse] = useState<Block[]>([]);
+    const [response, setResponse] = useState<any>();
 
     const handleSubmit = async (evt: any) => {
         if (file == null)
@@ -38,9 +40,13 @@ export default function FileUploader() {
         setLoading(true);
         const res = await ProcessDocument(formData);
         setLoading(false);
-        /*if (res.status === 'OK') {
-            setResponse(res.result);
-        }*/
+        if (res.code == OK) {
+            Notify(toast.TYPE.SUCCESS, "File updated successfully.");
+            setFile(null);
+        } else {
+            Notify(toast.TYPE.ERROR, res.message);
+        }
+        setResponse(res);
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -164,5 +170,6 @@ export default function FileUploader() {
                 Clear
             </Button>
         </div>
+
     </Box>
 }
