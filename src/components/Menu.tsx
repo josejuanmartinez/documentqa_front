@@ -3,7 +3,7 @@ import Button from '@mui/joy/Button';
 import Menu from '@mui/joy/Menu';
 import MenuItem from '@mui/joy/MenuItem';
 import Apps from '@mui/icons-material/Apps';
-import {MAIN_SCREEN, UPLOAD} from "../constants/const";
+import {MAIN_SCREEN, RESULTS_SCREEN, UPLOAD_SCREEN} from "../constants/const";
 
 export default function SelectedMenu({changeScreen}: {changeScreen: (index: number) => any}) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -14,8 +14,10 @@ export default function SelectedMenu({changeScreen}: {changeScreen: (index: numb
     };
     const createHandleClose = (index: number) => () => {
         setAnchorEl(null);
-        setSelectedIndex(index);
-        changeScreen(index);
+        if(index != -1) {
+            setSelectedIndex(index);
+            changeScreen(index);
+        }
     };
 
     return (
@@ -39,16 +41,22 @@ export default function SelectedMenu({changeScreen}: {changeScreen: (index: numb
                 aria-labelledby="selected-demo-button"
             >
                 <MenuItem
-                    {...(selectedIndex === 0 && { selected: true, variant: 'soft' })}
+                    {...(selectedIndex === MAIN_SCREEN && { selected: true, variant: 'soft' })}
                     onClick={createHandleClose(MAIN_SCREEN)}
                 >
-                    Main
+                    Search
                 </MenuItem>
                 <MenuItem
-                    {...(selectedIndex === 1 && { selected: true, variant: 'soft' })}
-                    onClick={createHandleClose(UPLOAD)}
+                    {...(selectedIndex === UPLOAD_SCREEN && { selected: true, variant: 'soft' })}
+                    onClick={createHandleClose(UPLOAD_SCREEN)}
                 >
-                    Index a file
+                    Index
+                </MenuItem>
+                <MenuItem
+                    {...(selectedIndex === RESULTS_SCREEN && { selected: true, variant: 'soft' })}
+                    onClick={createHandleClose(RESULTS_SCREEN)}
+                >
+                    Visualize
                 </MenuItem>
             </Menu>
         </div>

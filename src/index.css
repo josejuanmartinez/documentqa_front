@@ -76,6 +76,11 @@
   flex-grow: 1;
 }
 
+.uploadTab {
+  background-color: transparent;
+  flex-grow: 1;
+}
+
 .extractTxt {
   margin-left: 25px;
   margin-top: 1px;
@@ -107,4 +112,28 @@
 .MuiDataGrid-root .MuiDataGrid-cell {
   white-space: normal !important;
   word-wrap: break-word !important;
+}
+
+.MuiContainer-root {
+  max-width: none !important;
+}
+
+.searchTab {
+  height: 100%;
+  width: 100%;
+}
+
+.searchWidget {
+  display: block;
+  margin-top: 20%;
+  margin-left: 25% !important;
+  margin-right: 25%;
+  border: 2px;
+  border-color: black;
+  border-style: solid;
+  width: auto !important;
+}
+
+.searchInput {
+  display:flex !important;
 }

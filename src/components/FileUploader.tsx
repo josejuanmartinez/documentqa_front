@@ -3,14 +3,17 @@ import {Block} from "../types/Block";
 import {ProcessDocument} from "../api/api";
 import {ChangeEvent, Fragment, useState} from "react";
 import {Checkbox, Divider, Input, Select, Option} from "@mui/joy";
-import {CHUNKOVERLAP, CHUNKSIZE, OK, SEPARATORS} from "../constants/const";
+import {CHUNK_OVERLAP, CHUNK_SIZE, MAIN_SCREEN, OK, SEPARATORS} from "../constants/const";
 import Notify from "../utils/notifications";
 import {toast} from "react-toastify";
+import {customizeSplitting} from "../constants/featureToggles";
 
-export default function FileUploader() {
-    const defaultSeparator: string = "line";
-    const defaultChunkSize: number = CHUNKSIZE;
-    const defaultChunkOverlap: number = CHUNKOVERLAP;
+export default function FileUploader(
+    {changeScreen}: {changeScreen: (index: number) => void}
+) {
+    const defaultSeparator: string = "paragraph";
+    const defaultChunkSize: number = CHUNK_SIZE;
+    const defaultChunkOverlap: number = CHUNK_OVERLAP;
     const defaultExtractText: boolean = false;
     const defaultShownAdditional: boolean = false;
 
@@ -43,6 +46,7 @@ export default function FileUploader() {
         if (res.code == OK) {
             Notify(toast.TYPE.SUCCESS, "File updated successfully.");
             setFile(null);
+            changeScreen(MAIN_SCREEN);
         } else {
             Notify(toast.TYPE.ERROR, res.message);
         }
@@ -101,66 +105,68 @@ export default function FileUploader() {
             <span className="extractTxtBold">
                 {file ? `(${file.type})`: ''}
             </span>
-            {file ?
-                <div>
-                    <Checkbox
-                        className="extractTxt"
-                        label="Customize indexing process"
-                        checked={additionalShown}
-                        onChange={(checked) => changeAdditionalShown(checked!)}
-                    ></Checkbox>
-                </div> : ""
-            }
-            {file && additionalShown && file.type.toLowerCase() == 'application/pdf'?
-                <div>
-                    <Checkbox
-                        className="extractTxt"
-                        label="Index as txt instead of pdf"
-                        checked={extractText}
-                        onChange={(checked) => setExtractText(checked!)}
-                    />
-                </div> : ""}
-            {file && additionalShown? <Select
-                className="uploadParam"
-                value={separator}
-                onChange={(_, value) => changeSeparator(value)}
-                startDecorator={
+            <span hidden={!customizeSplitting}>
+                {file ?
+                    <div>
+                        <Checkbox
+                            className="extractTxt"
+                            label="Customize indexing process"
+                            checked={additionalShown}
+                            onChange={(checked) => changeAdditionalShown(checked!)}
+                        ></Checkbox>
+                    </div> : ""
+                }
+                {file && additionalShown && file.type.toLowerCase() == 'application/pdf'?
+                    <div>
+                        <Checkbox
+                            className="extractTxt"
+                            label="Index as txt instead of pdf"
+                            checked={extractText}
+                            onChange={(checked) => setExtractText(checked!)}
+                        />
+                    </div> : ""}
+                {file && additionalShown? <Select
+                    className="uploadParam"
+                    value={separator}
+                    onChange={(_, value) => changeSeparator(value)}
+                    startDecorator={
+                        <Fragment>
+                            <span className="dividerText">Separator</span>
+                            <Divider orientation="vertical" className="divider"/>
+                        </Fragment>
+                    }>
+                    <Option value="line">Line</Option>
+                    <Option value="paragraph">Paragraph</Option>
+                </Select> : ""}
+                {file && additionalShown? <Input
+                    className="uploadParam"
+                    type="number"
+                    defaultValue="500"
+                    placeholder=""
+                    value={chunkSize}
+                    onChange={(event) => changeChunkSize(event)}
+                    startDecorator={
                     <Fragment>
-                        <span className="dividerText">Separator</span>
+                        <span className="dividerText">Chunk Size</span>
                         <Divider orientation="vertical" className="divider"/>
                     </Fragment>
-                }>
-                <Option value="line">Line</Option>
-                <Option value="paragraph">Paragraph</Option>
-            </Select> : ""}
-            {file && additionalShown? <Input
-                className="uploadParam"
-                type="number"
-                defaultValue="500"
-                placeholder=""
-                value={chunkSize}
-                onChange={(event) => changeChunkSize(event)}
-                startDecorator={
-                <Fragment>
-                    <span className="dividerText">Chunk Size</span>
-                    <Divider orientation="vertical" className="divider"/>
-                </Fragment>
-                }>
-            </Input> : ""}
-            {file && additionalShown? <Input
-                className="uploadParam"
-                type="number"
-                defaultValue="100"
-                placeholder=""
-                value={chunkOverlap}
-                onChange={(event) => changeChunkOverlap(event)}
-                startDecorator={
-                    <Fragment>
-                        <span className="dividerText">Chunk Overlap</span>
-                        <Divider orientation="vertical" className="divider"/>
-                    </Fragment>
-                }>
-            </Input>: ""}
+                    }>
+                </Input> : ""}
+                {file && additionalShown? <Input
+                    className="uploadParam"
+                    type="number"
+                    defaultValue="100"
+                    placeholder=""
+                    value={chunkOverlap}
+                    onChange={(event) => changeChunkOverlap(event)}
+                    startDecorator={
+                        <Fragment>
+                            <span className="dividerText">Chunk Overlap</span>
+                            <Divider orientation="vertical" className="divider"/>
+                        </Fragment>
+                    }>
+                </Input>: ""}
+                </span>
         </div>
         <div>
             <Button

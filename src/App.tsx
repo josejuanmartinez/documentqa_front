@@ -1,11 +1,12 @@
 import {Box, Container} from '@mui/material';
-import SearchAppBar from './components/SearchBar';
-import {MAIN_SCREEN, UPLOAD} from "./constants/const";
+import TopBar from './components/TopBar';
+import {MAIN_SCREEN, RESULTS_SCREEN, UPLOAD_SCREEN} from "./constants/const";
 import FileUploader from "./components/FileUploader";
 import React, {useRef, useState} from "react";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ResultsVisualizer, {SearchChildRef} from "./components/ResultsVisualizer";
+import SearchScreen from "./components/SearchScreen";
 
 function App() {
   const [screen, setScreen] = useState(MAIN_SCREEN);
@@ -38,21 +39,27 @@ function App() {
             pauseOnHover
             theme="dark"
         />
-      <SearchAppBar changeScreen={changeScreen} changeResult={changeSearchResult}></SearchAppBar>
+      <TopBar changeScreen={changeScreen}></TopBar>
       <Container>
 
         <Box
-          className="resultTab"
+          className="searchTab"
           hidden={screen != MAIN_SCREEN}
         >
-            { screen == MAIN_SCREEN? <ResultsVisualizer ref={searchChildRef}></ResultsVisualizer> : null }
+            <SearchScreen changeScreen={changeScreen} changeResult={changeSearchResult}></SearchScreen>
         </Box>
         <Box
-            className="resultTab"
-            hidden={screen != UPLOAD}
+            className="uploadab"
+            hidden={screen != UPLOAD_SCREEN}
         >
-          { screen == UPLOAD? <FileUploader></FileUploader> : null }
+          <FileUploader changeScreen={changeScreen} ></FileUploader>
         </Box>
+          <Box
+              className="resultTab"
+              hidden={screen != RESULTS_SCREEN}
+          >
+              <ResultsVisualizer ref={searchChildRef}></ResultsVisualizer>
+          </Box>
       </Container>
     </div>
   );

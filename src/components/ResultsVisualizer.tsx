@@ -33,7 +33,7 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     }
 
     const columns: GridColDef[] = [
-        {field: 'answer', headerName: 'text', flex: 1},
+        {field: 'answer', headerName: 'Text', flex: 1},
         {field: 'filename', headerName: 'Filename', width: 100, flex: 0.1},
         {field: 'title', headerName: 'Title', width: 100, flex: 0.1},
         {field: 'author', headerName: 'Author', width: 100, flex: 0.1},
@@ -48,14 +48,26 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
                 rows={searchResult}
                 columns={columns}
                 autoHeight={true}
-                rowHeight={200}
+                rowHeight={100}
                 slots={{ toolbar: GridToolbar }}
                 sx={{
-                    boxShadow: 2,
-                    border: 2,
-                    borderColor: 'primary.light',
+                    boxShadow: 0,
+                    border: 0,
+                    borderColor: 'transparent',
                     '& .MuiDataGrid-cell:hover': {
                         color: 'primary.light',
+                    },
+                }}
+                initialState={{
+                    columns: {
+                        columnVisibilityModel: {
+                            // Hide columns status and traderName, the other columns will remain visible
+                            answer: true,
+                            filename: false,
+                            title: false,
+                            author: false,
+                            page_num: false
+                        },
                     },
                 }}
             />
