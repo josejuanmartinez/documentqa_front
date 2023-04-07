@@ -3,14 +3,14 @@ import {Block} from "../types/Block";
 import {ProcessDocument} from "../api/api";
 import {ChangeEvent, Fragment, useState} from "react";
 import {Checkbox, Divider, Input, Select, Option} from "@mui/joy";
-import {OK, SEPARATORS} from "../constants/const";
+import {CHUNKOVERLAP, CHUNKSIZE, OK, SEPARATORS} from "../constants/const";
 import Notify from "../utils/notifications";
 import {toast} from "react-toastify";
 
 export default function FileUploader() {
     const defaultSeparator: string = "line";
-    const defaultChunkSize: number = 500;
-    const defaultChunkOverlap: number = 100;
+    const defaultChunkSize: number = CHUNKSIZE;
+    const defaultChunkOverlap: number = CHUNKOVERLAP;
     const defaultExtractText: boolean = false;
     const defaultShownAdditional: boolean = false;
 
@@ -75,6 +75,17 @@ export default function FileUploader() {
         }
     };
 
+    const changeChunkSize = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target != null && event.target.value != null) {
+            setChunkSize(event.target.value);
+        }
+    };
+
+    const changeChunkOverlap = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target != null && event.target.value != null) {
+            setChunkOverlap(event.target.value);
+        }
+    };
 
     return <Box
         className="uploadBox"
@@ -128,7 +139,7 @@ export default function FileUploader() {
                 defaultValue="500"
                 placeholder=""
                 value={chunkSize}
-                onChange={(value) => setChunkSize(value!)}
+                onChange={(event) => changeChunkSize(event)}
                 startDecorator={
                 <Fragment>
                     <span className="dividerText">Chunk Size</span>
@@ -142,7 +153,7 @@ export default function FileUploader() {
                 defaultValue="100"
                 placeholder=""
                 value={chunkOverlap}
-                onChange={(value) => setChunkOverlap(value!)}
+                onChange={(event) => changeChunkOverlap(event)}
                 startDecorator={
                     <Fragment>
                         <span className="dividerText">Chunk Overlap</span>

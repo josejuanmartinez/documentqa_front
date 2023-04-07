@@ -21,13 +21,13 @@ export async function ProcessDocument(
   let isTxt = false;
   let endpoint: string = "process_pdf"
   if (!formData.has("file")) {
-    return { code: FORM_VALIDATION_ERROR, message: 'File not found in form', result: ''};
+    return { code: FORM_VALIDATION_ERROR, message: '`file` not found in form', result: ''};
   }
   if (!formData.has("filename")) {
-    return { code: FORM_VALIDATION_ERROR, message: 'Filename not found in form', result: ''};
+    return { code: FORM_VALIDATION_ERROR, message: 'Unable to retrieve `file` filename', result: ''};
   }
   if (!formData.has("filetype")) {
-    return { code: FORM_VALIDATION_ERROR, message: 'File type not found in form', result: ''};
+    return { code: FORM_VALIDATION_ERROR, message: 'Unable to retrieve `file` type', result: ''};
   } else {
     const filetype: any = formData.get("filetype");
     stringFiletype = filetype.toString();
@@ -48,6 +48,24 @@ export async function ProcessDocument(
 
   try {
     const response = await fetch(`${SERVER_URL}/${endpoint}`, {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await response.json();
+    return { code: result['code'], message: result['message'], result: result['result']};
+  } catch (e) {
+    console.log('Error', e);
+    return { code: INDEX_FILE_ERROR, message: e.message, result: ''};
+  }
+}
+
+export async function ProcessQuery(formData: FormData): Promise<{ code: number, message: string, result: string}> {
+  console.log('Form data', formData.keys());
+  if (!formData.has("question")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`question` not found in form', result: ''};
+  }
+  try {
+    const response = await fetch(`${SERVER_URL}/query`, {
       method: 'POST',
       body: formData,
     });

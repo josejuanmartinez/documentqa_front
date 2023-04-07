@@ -59,14 +59,6 @@
   font-weight: bold;
 }
 
-.MuiPaper-root {
-  background-color: #101010 !important;
-}
-
-.MuiSvgIcon-root {
-  fill: white !important;
-}
-
 .allApp {
   flex: 1;
 }
@@ -110,4 +102,9 @@
 .uploadParam {
   width:275px;
   margin-left: 25px;
+}
+
+.MuiDataGrid-root .MuiDataGrid-cell {
+  white-space: normal !important;
+  word-wrap: break-word !important;
 }

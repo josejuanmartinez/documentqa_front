@@ -6,7 +6,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import LoopIcon from '@mui/icons-material/Loop';
 import SelectedMenu from "./Menu";
+import {KeyboardEventHandler, useState} from "react";
+import {MAIN_SCREEN, OK, SEPARATORS} from "../constants/const";
+import {ProcessDocument, ProcessQuery} from "../api/api";
+import Notify from "../utils/notifications";
+import {toast} from "react-toastify";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -48,9 +54,40 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
             },
         },
     },
+
 }));
 
-export default function SearchAppBar({changeScreen}: {changeScreen: (index: number) => any}) {
+export default function SearchAppBar(
+    {changeScreen, changeResult}: {changeScreen: (index: number) => void, changeResult: (result: any[]) => void}
+) {
+
+    const [searchText, setSearchText] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleKeyUp = async (event: any) => {
+
+        if (event.key === 'Enter') {
+            // CALL TO API
+            const formData = new FormData();
+            formData.append("question", searchText);
+            setLoading(true);
+            const res = await ProcessQuery(formData);
+            setLoading(false);
+            if (res.code == OK) {
+                Notify(toast.TYPE.SUCCESS, "Rendering search results");
+            } else {
+                Notify(toast.TYPE.ERROR, res.message);
+            }
+            changeResult(JSON.parse(res.result));
+            //changeResult(res.result);
+            changeScreen(MAIN_SCREEN);
+        }
+    }
+
+    const handleChange = (event: any) => {
+        setSearchText(event.target.value);
+    }
+
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -69,14 +106,30 @@ export default function SearchAppBar({changeScreen}: {changeScreen: (index: numb
     </nav>
     </Typography>
     <Search>
-    <SearchIconWrapper>
-        <SearchIcon />
-    </SearchIconWrapper>
-    <StyledInputBase
-    placeholder="Search…"
-    inputProps={{ 'aria-label': 'search' }}
-    />
+        <SearchIconWrapper>
+            <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase
+            placeholder="Search…"
+            inputProps={{ 'aria-label': 'search' }}
+            onChange={handleChange}
+            onKeyUp={handleKeyUp}
+        />
     </Search>
+        {loading ?
+        <LoopIcon
+            sx={{
+                animation: "spin 2s linear infinite",
+                "@keyframes spin": {
+                    "0%": {
+                        transform: "rotate(360deg)",
+                    },
+                    "100%": {
+                        transform: "rotate(0deg)",
+                    },
+                },
+            }}
+        /> : '' }
     </Toolbar>
     </AppBar>
     </Box>

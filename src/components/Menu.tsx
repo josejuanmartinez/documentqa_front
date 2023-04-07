@@ -3,11 +3,11 @@ import Button from '@mui/joy/Button';
 import Menu from '@mui/joy/Menu';
 import MenuItem from '@mui/joy/MenuItem';
 import Apps from '@mui/icons-material/Apps';
-import {NO_SCREEN, UPLOAD} from "../constants/const";
+import {MAIN_SCREEN, UPLOAD} from "../constants/const";
 
 export default function SelectedMenu({changeScreen}: {changeScreen: (index: number) => any}) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [selectedIndex, setSelectedIndex] = React.useState<number>(NO_SCREEN);
+    const [selectedIndex, setSelectedIndex] = React.useState<number>(MAIN_SCREEN);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -40,7 +40,7 @@ export default function SelectedMenu({changeScreen}: {changeScreen: (index: numb
             >
                 <MenuItem
                     {...(selectedIndex === 0 && { selected: true, variant: 'soft' })}
-                    onClick={createHandleClose(NO_SCREEN)}
+                    onClick={createHandleClose(MAIN_SCREEN)}
                 >
                     Main
                 </MenuItem>
