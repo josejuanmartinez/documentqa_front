@@ -41,7 +41,7 @@ export async function ProcessDocument(
       isTxt = true;
     }
   }
-  isTxt = true;
+  isTxt = false;
   if(isTxt) {
     endpoint = "process_text";
   }

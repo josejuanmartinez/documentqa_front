@@ -54,7 +54,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function SearchScreen(
-    {changeScreen, changeResult}: {changeScreen: (index: number) => void, changeResult: (result: any[]) => void}
+    {changeScreen, changeResult, query, changeQuery}:
+        {
+            changeScreen: (index: number) => void,
+            changeResult: (result: any[]) => void,
+            changeQuery: (query: string) => void,
+            query: string}
 ) {
 
     const [searchText, setSearchText] = useState("");
@@ -81,10 +86,11 @@ export default function SearchScreen(
 
     const handleChange = (event: any) => {
         setSearchText(event.target.value);
+        changeQuery(event.target.value);
     }
 
     return (
-        <Box>
+        <Box className="resultTabScreen">
             <Search className="searchWidget">
                 <SearchIconWrapper>
                     {loading ?
@@ -103,7 +109,7 @@ export default function SearchScreen(
                         /> : <SearchIcon /> }
                 </SearchIconWrapper>
                 <StyledInputBase
-                    placeholder="Search…"
+                    placeholder={query? query : 'Search...'}
                     inputProps={{ 'aria-label': 'search' }}
                     onChange={handleChange}
                     onKeyUp={handleKeyUp}

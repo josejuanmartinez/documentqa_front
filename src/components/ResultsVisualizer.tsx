@@ -1,9 +1,10 @@
 import {Box} from "@mui/material";
-import {DataGrid, GridColDef, GridToolbar} from '@mui/x-data-grid';
-import React, {forwardRef, useImperativeHandle, useState} from "react";
+import {DataGrid, GridColDef, GridRenderCellParams, GridToolbar} from '@mui/x-data-grid';
+import React, {forwardRef, ReactNode, useImperativeHandle, useState} from "react";
+import {Style} from "@mui/icons-material";
 
 export interface SearchChildRef {
-    populateTable: (arraySearchResults: any)=> void;
+    populateTable: (arraySearchResults: any, query: string)=> void;
 }
 
 interface SearchProps {
@@ -12,13 +13,39 @@ interface SearchProps {
 
 const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) => {
     const [searchResult, setSearchResult] = useState<any[]>([]);
+    const [query, setQuery] = useState("");
+    const [queryWords, setQueryWords] = useState<any[]>([]);
+
+    const clean = (value: string): string => {
+        let res = value.replace('.','');
+        res = res.replace(',','');
+        res = res.replace(';','');
+        res = res.replace(':','');
+        return res;
+    }
+    const tokenize = (value: string): any[] => {
+        return clean(value).split(' ');
+    }
 
     // Expose myFunction to parent component
     useImperativeHandle(ref, () => ({
         populateTable,
     }));
 
-    const populateTable = (arraySearchResults: any) => {
+    const isInQuery = (value: string): boolean => {
+        return queryWords.findIndex(( item =>  clean(value).toLowerCase() === item.toLowerCase())) !== -1;
+    }
+
+    const highlightContent = (params: GridRenderCellParams): ReactNode => {
+        const tokens = tokenize(params.value);
+        return tokens.map((token, index) => (
+            <span className={isInQuery(token)? 'highlighted' : 'unhighlighted'}>{token}</span>
+        ));
+    }
+
+    const populateTable = (arraySearchResults: any, query: string) => {
+        setQuery(query);
+        setQueryWords(tokenize(query));
         let searchResultsMap: any[] = [];
         let counter = 0;
         arraySearchResults.forEach((a: any[]) => (searchResultsMap.push({
@@ -33,7 +60,9 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     }
 
     const columns: GridColDef[] = [
-        {field: 'answer', headerName: 'Text', flex: 1},
+        {field: 'answer', headerName: 'Text', flex: 1, renderCell: (params) => {
+                return highlightContent(params);}
+            },
         {field: 'filename', headerName: 'Filename', width: 100, flex: 0.1},
         {field: 'title', headerName: 'Title', width: 100, flex: 0.1},
         {field: 'author', headerName: 'Author', width: 100, flex: 0.1},

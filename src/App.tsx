@@ -11,15 +11,19 @@ import SearchScreen from "./components/SearchScreen";
 function App() {
   const [screen, setScreen] = useState(MAIN_SCREEN);
   const searchChildRef = useRef<SearchChildRef>(null);
+  const [query, setQuery] = useState("");
 
   const changeScreen = (newScreen: number) => {
       setScreen(newScreen);
+  }
+  const changeQuery = (newQuery: string) => {
+    setQuery(newQuery);
   }
 
   const changeSearchResult = (result: any[]) => {
       const mappedResults = result.map(a => [a.answer, a.filename, a.title, a.author, a.page_number, a.total_pages]);
       if (searchChildRef.current != undefined) {
-          searchChildRef.current.populateTable(mappedResults);
+          searchChildRef.current.populateTable(mappedResults,query);
       }
       console.log(mappedResults);
   }
@@ -46,7 +50,8 @@ function App() {
           className="searchTab"
           hidden={screen != MAIN_SCREEN}
         >
-            <SearchScreen changeScreen={changeScreen} changeResult={changeSearchResult}></SearchScreen>
+            <SearchScreen changeScreen={changeScreen} changeResult={changeSearchResult} query={query}
+                          changeQuery={changeQuery}></SearchScreen>
         </Box>
         <Box
             className="uploadab"
@@ -58,6 +63,8 @@ function App() {
               className="resultTab"
               hidden={screen != RESULTS_SCREEN}
           >
+              <SearchScreen changeScreen={changeScreen} changeResult={changeSearchResult} query={query}
+                            changeQuery={changeQuery}></SearchScreen>
               <ResultsVisualizer ref={searchChildRef}></ResultsVisualizer>
           </Box>
       </Container>

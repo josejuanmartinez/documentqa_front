@@ -119,13 +119,12 @@
 }
 
 .searchTab {
-  height: 100%;
-  width: 100%;
+  margin-top: 300px;
 }
 
 .searchWidget {
   display: block;
-  margin-top: 20%;
+  margin-top: 1%;
   margin-left: 25% !important;
   margin-right: 25%;
   border: 2px;
@@ -136,4 +135,16 @@
 
 .searchInput {
   display:flex !important;
+}
+
+.highlighted {
+  background-color: #ffff654f;
+}
+
+.unhighlighted {
+  white-space: nowrap;
+}
+
+.highlighted:after, .unhighlighted:after {
+  content: "\00a0";
 }
