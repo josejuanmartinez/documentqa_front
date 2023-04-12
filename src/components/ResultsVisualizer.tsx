@@ -1,10 +1,15 @@
 import {Box} from "@mui/material";
 import {DataGrid, GridColDef, GridRenderCellParams, GridToolbar} from '@mui/x-data-grid';
-import React, {forwardRef, ReactNode, useImperativeHandle, useState} from "react";
-import {Style} from "@mui/icons-material";
+import React, {forwardRef, ReactNode, useEffect, useImperativeHandle, useState} from "react";
+import {NLTK_ENGLISH, OK} from "../constants/const";
+import {Lemmatize, LemmatizeAndRemoveStopwords} from "../api/api";
+import Notify from "../utils/notifications";
+import {toast} from "react-toastify";
+import ArrowDownwardSharpIcon from '@mui/icons-material/ArrowDownwardSharp';
+import {Tooltip} from "@mui/joy";
 
 export interface SearchChildRef {
-    populateTable: (arraySearchResults: any, query: string)=> void;
+    populateTable: (arraySearchResults: any, contextedAnswer: string, query: string)=> void;
 }
 
 interface SearchProps {
@@ -15,16 +20,83 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     const [searchResult, setSearchResult] = useState<any[]>([]);
     const [query, setQuery] = useState("");
     const [queryWords, setQueryWords] = useState<any[]>([]);
+    const [highlightedWords, setHighlightedWords] = useState<any[]>([]);
+    const [contextedAnswer, setContextedAnswer] = useState<string>("");
+    const [displayedContent, setDisplayedContent] = useState("");
+
+    const [index, setIndex] = useState(0)
+    const speed=10;
+
+    const TypeAnswer =  ( (answer: string) => {
+        console.log(displayedContent);
+        setDisplayedContent("");
+        console.log(answer);
+        setContextedAnswer(answer);
+        console.log(index);
+        setIndex(0);
+
+        const animKey = setInterval(() => {
+            setIndex((index) => {
+                /*This setState function will set the index
+                to index+1 if there is more content otherwise
+                it will destory this animation*/
+
+                if (index >= answer.length - 1) {
+                    clearInterval(animKey);
+                    return index;
+                }
+                return index + 1;
+            });
+        }, speed);
+    })
+
+    useEffect(() => {
+        setDisplayedContent((displayedContent) => displayedContent + contextedAnswer[index])
+    }, [index])
+
+    useEffect( () => {
+        async function calculateHighlightedWords() {
+            setHighlightedWords([]);
+            for (const a of searchResult) {
+                const res = a["answer"];
+                const cleanRes = clean(res);
+                const formData = new FormData();
+                formData.append("text", cleanRes);
+                formData.append("lan", NLTK_ENGLISH);
+                await Lemmatize(formData).then(data => {
+                        const tokens = tokenize(data.result);
+                        tokens.forEach((t: string) => {
+                            if (isInQuery(t)) {
+                                highlightedWords.push(t);
+                            }
+                        });
+                    }
+                );
+            }
+        }
+        calculateHighlightedWords();
+    }, [query]);
+
+    const calculateQueryWords = async (text: string): Promise<void> => {
+        const formData = new FormData();
+        formData.append("text", text);
+        formData.append("lan", NLTK_ENGLISH);
+        const res = await LemmatizeAndRemoveStopwords(formData);
+        let finalRes = text;
+        if (res.code == OK) {
+            finalRes = res.result;
+        } else {
+            Notify(toast.TYPE.ERROR, res.message);
+        }
+        setQueryWords(finalRes.split(' '));
+    }
 
     const clean = (value: string): string => {
-        let res = value.replace('.','');
-        res = res.replace(',','');
-        res = res.replace(';','');
-        res = res.replace(':','');
-        return res;
+        return value.replace(/[^a-zA-Z \s]/g, '')
     }
+
     const tokenize = (value: string): any[] => {
-        return clean(value).split(' ');
+        return value.split(' ');
     }
 
     // Expose myFunction to parent component
@@ -33,30 +105,41 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     }));
 
     const isInQuery = (value: string): boolean => {
-        return queryWords.findIndex(( item =>  clean(value).toLowerCase() === item.toLowerCase())) !== -1;
+        return queryWords.findIndex(( item =>  clean(value).toLowerCase() === clean(item).toLowerCase())) !== -1;
     }
 
     const highlightContent = (params: GridRenderCellParams): ReactNode => {
-        const tokens = tokenize(params.value);
-        return tokens.map((token, index) => (
-            <span className={isInQuery(token)? 'highlighted' : 'unhighlighted'}>{token}</span>
+        const tokens  = tokenize(clean(params.value));
+        const res = [];
+        res.push(<span className="unrelevant_icon">&darr;</span>);
+        tokens.map((token, index) => ( res.push(
+            <span className={isInQuery(token) ? 'highlighted' : 'unhighlighted'}>{token}</span>)
         ));
+        return res;
     }
 
-    const populateTable = (arraySearchResults: any, query: string) => {
-        setQuery(query);
-        setQueryWords(tokenize(query));
-        let searchResultsMap: any[] = [];
-        let counter = 0;
-        arraySearchResults.forEach((a: any[]) => (searchResultsMap.push({
-            'id': counter++,
-            'answer': a[0],
-            'filename': a[1],
-            'title': a[2],
-            'author': a[3],
-            'page_num': a[4] + "/" + a[5],
-        })));
-        setSearchResult(searchResultsMap);
+    const populateTable = (arraySearchResults: any, answer: string, query: string) => {
+        console.log(answer);
+        calculateQueryWords(query).then(r => {
+            let searchResultsMap: any[] = [];
+            let counter = 0;
+            arraySearchResults.forEach((a: any[]) => (searchResultsMap.push({
+                'id': counter++,
+                'answer': a[0],
+                'filename': a[1],
+                'title': a[2],
+                'author': a[3],
+                'page_num': a[4] + "/" + a[5],
+                'distance': a[6],
+                'is_relevant': a[7]
+            })));
+            let highlightedWords: string[] = []
+
+            setHighlightedWords(highlightedWords);
+            setSearchResult(searchResultsMap);
+            setQuery(query);
+            TypeAnswer(answer);
+        });
     }
 
     const columns: GridColDef[] = [
@@ -67,18 +150,24 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
         {field: 'title', headerName: 'Title', width: 100, flex: 0.1},
         {field: 'author', headerName: 'Author', width: 100, flex: 0.1},
         {field: 'page_num', headerName: 'Page', width: 30, flex: 0.1},
+        {field: 'distance', headerName: 'Distance', width: 30, flex: 0.1},
+        {field: 'is_relevant', headerName: 'Relevant', width: 30, flex: 0.1},
     ];
 
     return <Box
         className="resultsBox"
     >
         <div>
+            <pre className="type-writer">{displayedContent}</pre>
             <DataGrid
                 rows={searchResult}
                 columns={columns}
                 autoHeight={true}
                 rowHeight={100}
                 slots={{ toolbar: GridToolbar }}
+                getRowClassName={(params) => {
+                    return params.row.is_relevant ? "relevant" : "unrelevant";
+                }}
                 sx={{
                     boxShadow: 0,
                     border: 0,
@@ -95,8 +184,13 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
                             filename: false,
                             title: false,
                             author: false,
-                            page_num: false
+                            page_num: false,
+                            distance:false,
+                            is_relevant:false
                         },
+                    },
+                    sorting: {
+                        sortModel: [{ field: 'distance', sort: 'asc' }],
                     },
                 }}
             />

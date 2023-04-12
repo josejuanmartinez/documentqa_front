@@ -20,12 +20,14 @@ function App() {
     setQuery(newQuery);
   }
 
-  const changeSearchResult = (result: any[]) => {
-      const mappedResults = result.map(a => [a.answer, a.filename, a.title, a.author, a.page_number, a.total_pages]);
+  const changeSearchResult = (result: any) => {
+      const answers: any[] =result['answers'];
+      const contextedAnswer: string = result['contexted_answer'];
+      const mappedResults = answers.map(a => [a.answer, a.filename, a.title, a.author, a.page_number,
+                                                    a.total_pages, a.distance, a.is_relevant]);
       if (searchChildRef.current != undefined) {
-          searchChildRef.current.populateTable(mappedResults,query);
+          searchChildRef.current.populateTable(mappedResults, contextedAnswer, query);
       }
-      console.log(mappedResults);
   }
 
 

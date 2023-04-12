@@ -1,4 +1,4 @@
-import {FORM_VALIDATION_ERROR, INDEX_FILE_ERROR, SERVER_URL} from '../constants/const'
+import {FORM_VALIDATION_ERROR, INDEX_FILE_ERROR, QUERY_ERROR, SERVER_URL, STOPWORDS_ERROR} from '../constants/const'
 
 export async function checkApiStatus() {
   try {
@@ -15,7 +15,6 @@ export async function checkApiStatus() {
 export async function ProcessDocument(
   formData: FormData,
 ): Promise<{ code: number, message: string, result: string}> {
-  console.log('Form data', formData.keys());
 
   let stringFiletype: any = "application/pdf";
   let isTxt = false;
@@ -54,13 +53,11 @@ export async function ProcessDocument(
     const result = await response.json();
     return { code: result['code'], message: result['message'], result: result['result']};
   } catch (e) {
-    console.log('Error', e);
     return { code: INDEX_FILE_ERROR, message: e.message, result: ''};
   }
 }
 
 export async function ProcessQuery(formData: FormData): Promise<{ code: number, message: string, result: string}> {
-  console.log('Form data', formData.keys());
   if (!formData.has("question")) {
     return { code: FORM_VALIDATION_ERROR, message: '`question` not found in form', result: ''};
   }
@@ -72,7 +69,46 @@ export async function ProcessQuery(formData: FormData): Promise<{ code: number, 
     const result = await response.json();
     return { code: result['code'], message: result['message'], result: result['result']};
   } catch (e) {
-    console.log('Error', e);
-    return { code: INDEX_FILE_ERROR, message: e.message, result: ''};
+    return { code: QUERY_ERROR, message: e.message, result: ''};
+  }
+}
+
+export async function LemmatizeAndRemoveStopwords(formData: FormData): Promise<{ code: number, message: string, result: string}> {
+  if (!formData.has("text")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`text` not found in form', result: ''};
+  }
+  if (!formData.has("lan")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`lan` not found in form', result: ''};
+  }
+  try {
+    const response = await fetch(`${SERVER_URL}/lemmatize_stopwords`, {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await response.json();
+    return { code: result['code'], message: result['message'], result: result['result']};
+  } catch (e) {
+    return { code: STOPWORDS_ERROR, message: e.message, result: ''};
+  }
+}
+
+
+export async function Lemmatize(formData: FormData): Promise<{ code: number, message: string, result: string}> {
+  if (!formData.has("text")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`text` not found in form', result: ''};
+  }
+  if (!formData.has("lan")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`lan` not found in form', result: ''};
+  }
+  try {
+    const response = await fetch(`${SERVER_URL}/lemmatize`, {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await response.json();
+    return { code: result['code'], message: result['message'], result: result['result']};
+
+  } catch (e) {
+    return { code: STOPWORDS_ERROR, message: e.message, result: ''};
   }
 }

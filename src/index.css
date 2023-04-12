@@ -110,8 +110,9 @@
 }
 
 .MuiDataGrid-root .MuiDataGrid-cell {
-  white-space: normal !important;
   word-wrap: break-word !important;
+  display:block !important;
+  white-space: break-spaces !important;
 }
 
 .MuiContainer-root {
@@ -127,9 +128,7 @@
   margin-top: 1%;
   margin-left: 25% !important;
   margin-right: 25%;
-  border: 2px;
-  border-color: black;
-  border-style: solid;
+  border: 2px solid black;
   width: auto !important;
 }
 
@@ -148,3 +147,27 @@
 .highlighted:after, .unhighlighted:after {
   content: "\00a0";
 }
+
+.relevant {
+  display:block
+}
+
+.unrelevant {
+  opacity: .5;
+  display:block;
+}
+
+.relevant .unrelevant_icon {
+  visibility: hidden;
+}
+
+.unrelevant_icon {
+  cursor: context-menu;
+  margin-right: 4px;
+  font-size: x-large;
+}
+
+.type-writer {
+  white-space: break-spaces;
+}
+

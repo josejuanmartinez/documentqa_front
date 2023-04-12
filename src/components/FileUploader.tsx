@@ -54,14 +54,12 @@ export default function FileUploader(
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('e.target', e.target.files);
         if (e.target.files) {
             setFile(e.target.files[0]);
         }
     };
 
     const changeAdditionalShown = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('e', e);
         setAdditionalShown(e.target.checked)
         if (!e.target.checked) {
             setSeparator(defaultSeparator);
@@ -71,7 +69,6 @@ export default function FileUploader(
     };
 
     const changeSeparator = (value: ChangeEvent<HTMLInputElement>) => {
-        console.log('value', value);
         if (value == null) {
             setSeparator(defaultSeparator);
         } else {

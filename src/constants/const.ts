@@ -6,6 +6,8 @@ export const OK = 0;
 
 export const FORM_VALIDATION_ERROR = 1000;
 export const INDEX_FILE_ERROR = 1001;
+export const QUERY_ERROR = 1002;
+export const STOPWORDS_ERROR = 1003;
 
 export const SEPARATORS  = Object();
 SEPARATORS["line"] = ".\n";
@@ -13,3 +15,7 @@ SEPARATORS["paragraph"] = "\n\n";
 
 export const CHUNK_SIZE = 0;
 export const CHUNK_OVERLAP= 0;
+
+export const NLTK_ENGLISH = "english"
+
+export const RELEVANT_THRESHOLD = 0.41
