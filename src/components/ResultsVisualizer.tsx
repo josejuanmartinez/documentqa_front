@@ -5,8 +5,6 @@ import {NLTK_ENGLISH, OK} from "../constants/const";
 import {Lemmatize, LemmatizeAndRemoveStopwords} from "../api/api";
 import Notify from "../utils/notifications";
 import {toast} from "react-toastify";
-import ArrowDownwardSharpIcon from '@mui/icons-material/ArrowDownwardSharp';
-import {Tooltip} from "@mui/joy";
 
 export interface SearchChildRef {
     populateTable: (arraySearchResults: any, contextedAnswer: string, query: string)=> void;
@@ -21,38 +19,23 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     const [query, setQuery] = useState("");
     const [queryWords, setQueryWords] = useState<any[]>([]);
     const [highlightedWords, setHighlightedWords] = useState<any[]>([]);
-    const [contextedAnswer, setContextedAnswer] = useState<string>("");
     const [displayedContent, setDisplayedContent] = useState("");
 
     const [index, setIndex] = useState(0)
     const speed=10;
 
     const TypeAnswer =  ( (answer: string) => {
-        console.log(displayedContent);
-        setDisplayedContent("");
-        console.log(answer);
-        setContextedAnswer(answer);
-        console.log(index);
-        setIndex(0);
-
+        let counter = 0;
         const animKey = setInterval(() => {
-            setIndex((index) => {
-                /*This setState function will set the index
-                to index+1 if there is more content otherwise
-                it will destory this animation*/
-
-                if (index >= answer.length - 1) {
-                    clearInterval(animKey);
-                    return index;
-                }
-                return index + 1;
-            });
+            if (answer.length >= counter) {
+                setDisplayedContent(answer.slice(0, counter))
+                counter++;
+            }
+            if (answer.length < counter) {
+                clearInterval(animKey);
+            }
         }, speed);
     })
-
-    useEffect(() => {
-        setDisplayedContent((displayedContent) => displayedContent + contextedAnswer[index])
-    }, [index])
 
     useEffect( () => {
         async function calculateHighlightedWords() {
@@ -111,20 +94,21 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     const highlightContent = (params: GridRenderCellParams): ReactNode => {
         const tokens  = tokenize(clean(params.value));
         const res = [];
-        res.push(<span className="unrelevant_icon">&darr;</span>);
+        let counter = 0;
+        res.push(<span key={counter++} className="unrelevant_icon">&darr;</span>);
         tokens.map((token, index) => ( res.push(
-            <span className={isInQuery(token) ? 'highlighted' : 'unhighlighted'}>{token}</span>)
+            <span key={counter++} className={isInQuery(token) ? 'highlighted' : 'unhighlighted'}>{token}</span>)
         ));
         return res;
     }
 
     const populateTable = (arraySearchResults: any, answer: string, query: string) => {
-        console.log(answer);
         calculateQueryWords(query).then(r => {
             let searchResultsMap: any[] = [];
             let counter = 0;
             arraySearchResults.forEach((a: any[]) => (searchResultsMap.push({
                 'id': counter++,
+                'key': counter++,
                 'answer': a[0],
                 'filename': a[1],
                 'title': a[2],
@@ -138,6 +122,7 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
             setHighlightedWords(highlightedWords);
             setSearchResult(searchResultsMap);
             setQuery(query);
+            setDisplayedContent("");
             TypeAnswer(answer);
         });
     }
@@ -157,7 +142,6 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
     return <Box
         className="resultsBox"
     >
-        <div>
             <pre className="type-writer">{displayedContent}</pre>
             <DataGrid
                 rows={searchResult}
@@ -194,7 +178,6 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
                     },
                 }}
             />
-        </div>
     </Box>
 
 });

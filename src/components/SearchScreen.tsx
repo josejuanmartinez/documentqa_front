@@ -1,5 +1,5 @@
 import {ProcessQuery} from "../api/api";
-import {MAIN_SCREEN, OK, RESULTS_SCREEN} from "../constants/const";
+import {OK, RESULTS_SCREEN} from "../constants/const";
 import {toast} from "react-toastify";
 import SearchIcon from "@mui/icons-material/Search";
 import LoopIcon from "@mui/icons-material/Loop";
@@ -9,6 +9,7 @@ import {alpha, styled} from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import {useState} from "react";
 import Notify from "../utils/notifications";
+import {features} from "../constants/features";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -71,6 +72,8 @@ export default function SearchScreen(
             // CALL TO API
             const formData = new FormData();
             formData.append("question", searchText);
+            formData.append("generate_answer", features["generateAnswer"].toString());
+
             setLoading(true);
             const res = await ProcessQuery(formData);
             setLoading(false);

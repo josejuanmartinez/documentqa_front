@@ -1,12 +1,11 @@
 import {Box, Button, CircularProgress} from "@mui/material";
-import {Block} from "../types/Block";
 import {ProcessDocument} from "../api/api";
 import {ChangeEvent, Fragment, useState} from "react";
 import {Checkbox, Divider, Input, Select, Option} from "@mui/joy";
 import {CHUNK_OVERLAP, CHUNK_SIZE, MAIN_SCREEN, OK, SEPARATORS} from "../constants/const";
 import Notify from "../utils/notifications";
 import {toast} from "react-toastify";
-import {customizeSplitting} from "../constants/featureToggles";
+import {features} from "../constants/features";
 
 export default function FileUploader(
     {changeScreen}: {changeScreen: (index: number) => void}
@@ -102,7 +101,7 @@ export default function FileUploader(
             <span className="extractTxtBold">
                 {file ? `(${file.type})`: ''}
             </span>
-            <span hidden={!customizeSplitting}>
+            <span hidden={!features["customizeSplitting"]}>
                 {file ?
                     <div>
                         <Checkbox
@@ -138,7 +137,6 @@ export default function FileUploader(
                 {file && additionalShown? <Input
                     className="uploadParam"
                     type="number"
-                    defaultValue="500"
                     placeholder=""
                     value={chunkSize}
                     onChange={(event) => changeChunkSize(event)}
@@ -152,7 +150,6 @@ export default function FileUploader(
                 {file && additionalShown? <Input
                     className="uploadParam"
                     type="number"
-                    defaultValue="100"
                     placeholder=""
                     value={chunkOverlap}
                     onChange={(event) => changeChunkOverlap(event)}

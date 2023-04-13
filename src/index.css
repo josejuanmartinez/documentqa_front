@@ -171,3 +171,19 @@
   white-space: break-spaces;
 }
 
+.togglingFeaturesBox {
+  margin-left: 45%;
+  margin-top: 10px;
+  display:grid;
+  top:2px;
+}
+
+.datagridDiv {
+  width: 1000px;
+}
+
+input[type="checkbox"] {
+  height: 1rem;
+  width: 1rem;
+}
+

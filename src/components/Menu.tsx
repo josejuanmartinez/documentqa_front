@@ -3,7 +3,7 @@ import Button from '@mui/joy/Button';
 import Menu from '@mui/joy/Menu';
 import MenuItem from '@mui/joy/MenuItem';
 import Apps from '@mui/icons-material/Apps';
-import {MAIN_SCREEN, RESULTS_SCREEN, UPLOAD_SCREEN} from "../constants/const";
+import {MAIN_SCREEN, RESULTS_SCREEN, UPLOAD_SCREEN, TOGGLING_FEATURES_SCREEN} from "../constants/const";
 
 export default function SelectedMenu({changeScreen}: {changeScreen: (index: number) => any}) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -56,7 +56,13 @@ export default function SelectedMenu({changeScreen}: {changeScreen: (index: numb
                     {...(selectedIndex === RESULTS_SCREEN && { selected: true, variant: 'soft' })}
                     onClick={createHandleClose(RESULTS_SCREEN)}
                 >
-                    Visualize
+                    Check
+                </MenuItem>
+                <MenuItem
+                    {...(selectedIndex === TOGGLING_FEATURES_SCREEN && { selected: true, variant: 'soft' })}
+                    onClick={createHandleClose(TOGGLING_FEATURES_SCREEN)}
+                >
+                    Configure
                 </MenuItem>
             </Menu>
         </div>
