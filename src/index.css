@@ -134,6 +134,7 @@
 
 .searchInput {
   display:flex !important;
+  margin-right:3%;
 }
 
 .highlighted {

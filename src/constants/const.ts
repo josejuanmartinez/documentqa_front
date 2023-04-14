@@ -10,6 +10,8 @@ export const FORM_VALIDATION_ERROR = 1000;
 export const INDEX_FILE_ERROR = 1001;
 export const QUERY_ERROR = 1002;
 export const STOPWORDS_ERROR = 1003;
+export const LEMMATIZATION_ERROR = 1004;
+export const LOGIN_ERROR = 1005;
 
 export const SEPARATORS  = Object();
 SEPARATORS["line"] = ".\n";

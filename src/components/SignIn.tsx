@@ -1,5 +1,4 @@
 import React from "react"
-import axios from 'axios'
 import { useSignIn } from 'react-auth-kit'
 import {
     Checkbox,
@@ -9,11 +8,11 @@ import {
     Paper,
     Button
 } from '@mui/material';
-import {SERVER_URL, SUCCESS} from "../constants/const";
-import {features} from "../constants/features";
+import {SUCCESS} from "../constants/const";
 import Notify from "../utils/notifications";
 import {toast} from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import {Login} from "../api/api";
 
 export const SignInComponent = () => {
     const signIn = useSignIn()
@@ -33,35 +32,33 @@ export const SignInComponent = () => {
         setPassword(event.target.value);
     };
 
-    const onSubmit = (e:any) => {
+    async function onSubmit (e:any): Promise<void> {
         e.preventDefault()
         const formData = new FormData();
         formData.append("email", email);
         formData.append("password", password);
-
-        //TODO: Move to API!
-        axios.post(`${SERVER_URL}/login`, formData)
-            .then((res)=>{
-                if(res.data.code === SUCCESS){
-                    if(signIn(
-                        {
-                            token: res.data.result.token,
-                            expiresIn:res.data.result.expiresIn,
-                            tokenType: "Bearer",
-                            authState: res.data.result.authUserState,
-                            //refreshToken: res.data.refreshToken,                    // Only if you are using refreshToken feature
-                            //refreshTokenExpireIn: res.data.refreshTokenExpireIn     // Only if you are using refreshToken feature
-                        }
-                    )){
-                        Notify(toast.TYPE.SUCCESS, res.data.message);
-                        navigate("/");
-                    }else {
-                        Notify(toast.TYPE.ERROR, res.data.message);
+        await Login(formData).then(data => {
+            if (data.code === SUCCESS) {
+                if (signIn(
+                    {
+                        token: data.result.token,
+                        expiresIn: data.result.expiresIn,
+                        tokenType: "Bearer",
+                        authState: data.result.authUserState,
+                        //refreshToken: res.data.refreshToken,                    // Only if you are using refreshToken feature
+                        //refreshTokenExpireIn: res.data.refreshTokenExpireIn     // Only if you are using refreshToken feature
                     }
+                )) {
+                    Notify(toast.TYPE.SUCCESS, data.message);
+                    navigate("/");
                 } else {
-                    Notify(toast.TYPE.ERROR, res.data.message);
+                    Notify(toast.TYPE.ERROR, data.message);
                 }
-            })
+            } else {
+                Notify(toast.TYPE.ERROR, data.message);
+            }
+            }
+        );
     }
 
     return (

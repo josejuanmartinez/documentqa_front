@@ -1,4 +1,14 @@
-import {FORM_VALIDATION_ERROR, INDEX_FILE_ERROR, QUERY_ERROR, SERVER_URL, STOPWORDS_ERROR} from '../constants/const'
+import {
+  FORM_VALIDATION_ERROR,
+  INDEX_FILE_ERROR, LEMMATIZATION_ERROR, LOGIN_ERROR,
+  QUERY_ERROR,
+  SERVER_URL,
+  STOPWORDS_ERROR,
+  SUCCESS
+} from '../constants/const'
+import axios from "axios";
+import Notify from "../utils/notifications";
+import {toast} from "react-toastify";
 
 export async function checkApiStatus() {
   try {
@@ -14,7 +24,7 @@ export async function checkApiStatus() {
 
 export async function ProcessDocument(
   formData: FormData,
-): Promise<{ code: number, message: string, result: string}> {
+): Promise<{ code: number, message: string, result: any}> {
 
   let stringFiletype: any = "application/pdf";
   let isTxt = false;
@@ -57,7 +67,7 @@ export async function ProcessDocument(
   }
 }
 
-export async function ProcessQuery(formData: FormData): Promise<{ code: number, message: string, result: string}> {
+export async function ProcessQuery(formData: FormData): Promise<{ code: number, message: string, result: any}> {
   if (!formData.has("question")) {
     return { code: FORM_VALIDATION_ERROR, message: '`question` not found in form', result: ''};
   }
@@ -73,7 +83,7 @@ export async function ProcessQuery(formData: FormData): Promise<{ code: number, 
   }
 }
 
-export async function LemmatizeAndRemoveStopwords(formData: FormData): Promise<{ code: number, message: string, result: string}> {
+export async function LemmatizeAndRemoveStopwords(formData: FormData): Promise<{ code: number, message: string, result: any}> {
   if (!formData.has("text")) {
     return { code: FORM_VALIDATION_ERROR, message: '`text` not found in form', result: ''};
   }
@@ -93,7 +103,7 @@ export async function LemmatizeAndRemoveStopwords(formData: FormData): Promise<{
 }
 
 
-export async function Lemmatize(formData: FormData): Promise<{ code: number, message: string, result: string}> {
+export async function Lemmatize(formData: FormData): Promise<{ code: number, message: string, result: any}> {
   if (!formData.has("text")) {
     return { code: FORM_VALIDATION_ERROR, message: '`text` not found in form', result: ''};
   }
@@ -109,6 +119,24 @@ export async function Lemmatize(formData: FormData): Promise<{ code: number, mes
     return { code: result['code'], message: result['message'], result: result['result']};
 
   } catch (e) {
-    return { code: STOPWORDS_ERROR, message: e.message, result: ''};
+    return { code: LEMMATIZATION_ERROR, message: e.message, result: ''};
+  }
+}
+
+export async function Login(formData: FormData): Promise<{ code: number, message: string, result: any}> {
+  if (!formData.has("email")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`email` not found in form', result: ''};
+  }
+  if (!formData.has("password")) {
+    return { code: FORM_VALIDATION_ERROR, message: '`password` not found in form', result: ''};
+  }
+  try {
+    const result = await axios.post(`${SERVER_URL}/login`, formData)
+        .then((res) => {
+          return res.data;
+        });
+    return { code: result['code'], message: result['message'], result: result['result']};
+  } catch (e) {
+    return { code: LOGIN_ERROR, message: e.message, result: ''};
   }
 }

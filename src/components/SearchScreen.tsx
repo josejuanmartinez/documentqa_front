@@ -10,6 +10,8 @@ import InputBase from "@mui/material/InputBase";
 import {useState} from "react";
 import Notify from "../utils/notifications";
 import {features} from "../constants/features";
+import {KeyboardReturn, KeyboardReturnOutlined, KeyboardReturnTwoTone} from "@mui/icons-material";
+import {Tooltip} from "@mui/joy";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -54,6 +56,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 }));
 
+const SearchIconEndWrapper = styled('div')(({ theme }) => ({
+    top: '7px',
+    right: '0px',
+    position: 'absolute',
+    display: 'block',
+    alignSelf: 'right',
+    alignItems: 'right',
+    justifyContent: 'right',
+}));
+
 export default function SearchScreen(
     {changeScreen, changeResult, query, changeQuery}:
         {
@@ -66,24 +78,26 @@ export default function SearchScreen(
     const [searchText, setSearchText] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const triggerSearch = async (): Promise<void> => {
+        // CALL TO API
+        const formData = new FormData();
+        formData.append("question", searchText);
+        formData.append("generate_answer", features["generateAnswer"].toString());
+
+        setLoading(true);
+        const res = await ProcessQuery(formData);
+        setLoading(false);
+        if (res.code == OK) {
+            Notify(toast.TYPE.SUCCESS, "Rendering search results");
+        } else {
+            Notify(toast.TYPE.ERROR, res.message);
+        }
+        changeResult(res.result);
+        changeScreen(RESULTS_SCREEN);
+    }
     const handleKeyUp = async (event: any) => {
-
         if (event.key === 'Enter') {
-            // CALL TO API
-            const formData = new FormData();
-            formData.append("question", searchText);
-            formData.append("generate_answer", features["generateAnswer"].toString());
-
-            setLoading(true);
-            const res = await ProcessQuery(formData);
-            setLoading(false);
-            if (res.code == OK) {
-                Notify(toast.TYPE.SUCCESS, "Rendering search results");
-            } else {
-                Notify(toast.TYPE.ERROR, res.message);
-            }
-            changeResult(JSON.parse(res.result));
-            changeScreen(RESULTS_SCREEN);
+            triggerSearch();
         }
     }
 
@@ -118,6 +132,9 @@ export default function SearchScreen(
                     onKeyUp={handleKeyUp}
                     className="searchInput"
                 />
+                <SearchIconEndWrapper>
+                    <Tooltip title="Press `enter` to search"><KeyboardReturnOutlined color="disabled" onClick={triggerSearch} cursor="pointer"/></Tooltip>
+                </SearchIconEndWrapper>
 
             </Search>
 

@@ -47,7 +47,7 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
                 formData.append("text", cleanRes);
                 formData.append("lan", NLTK_ENGLISH);
                 await Lemmatize(formData).then(data => {
-                        const tokens = tokenize(data.result);
+                        const tokens = tokenize(unifySpaces(data.result));
                         tokens.forEach((t: string) => {
                             if (isInQuery(t)) {
                                 highlightedWords.push(t);
@@ -71,15 +71,19 @@ const ResultsVisualizer = forwardRef<SearchChildRef, SearchProps>((props, ref) =
         } else {
             Notify(toast.TYPE.ERROR, res.message);
         }
-        setQueryWords(finalRes.split(' '));
+        setQueryWords(tokenize(unifySpaces(finalRes)));
+    }
+
+    const unifySpaces = (value: string): string => {
+        return value.replace(/[\t\n ]+/g, ' ');
     }
 
     const clean = (value: string): string => {
-        return value.replace(/[^a-zA-Z \s]/g, '')
+        return unifySpaces(value.replace(/[^a-zA-Z \s]/g, ''));
     }
 
     const tokenize = (value: string): any[] => {
-        return value.split(' ');
+        return value.split(' ').filter( token => token.trim() != '');
     }
 
     // Expose myFunction to parent component
