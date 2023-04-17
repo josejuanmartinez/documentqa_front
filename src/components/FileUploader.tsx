@@ -29,6 +29,8 @@ export default function FileUploader(
     const handleSubmit = async (evt: any) => {
         if (file == null)
             return;
+        if (loading)
+            return;
 
         const formData = new FormData();
         formData.append("file", file);
@@ -41,7 +43,8 @@ export default function FileUploader(
         formData.append("chunk_overlap", chunkOverlap);
         setLoading(true);
         const res = await ProcessDocument(formData);
-        setLoading(false);
+
+        setTimeout(() => setLoading(false), 5000);
         if (res.code == OK) {
             Notify(toast.TYPE.SUCCESS, "File updated successfully.");
             setFile(null);

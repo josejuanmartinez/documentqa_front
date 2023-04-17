@@ -7,8 +7,6 @@ import {
   SUCCESS
 } from '../constants/const'
 import axios from "axios";
-import Notify from "../utils/notifications";
-import {toast} from "react-toastify";
 
 export async function checkApiStatus() {
   try {

@@ -10,7 +10,7 @@ import InputBase from "@mui/material/InputBase";
 import {useState} from "react";
 import Notify from "../utils/notifications";
 import {features} from "../constants/features";
-import {KeyboardReturn, KeyboardReturnOutlined, KeyboardReturnTwoTone} from "@mui/icons-material";
+import {KeyboardReturnOutlined} from "@mui/icons-material";
 import {Tooltip} from "@mui/joy";
 
 const Search = styled('div')(({ theme }) => ({
@@ -79,6 +79,11 @@ export default function SearchScreen(
     const [loading, setLoading] = useState(false);
 
     const triggerSearch = async (): Promise<void> => {
+        if (loading) {
+            Notify(toast.TYPE.ERROR, "Wait!")
+            return;
+        }
+
         // CALL TO API
         const formData = new FormData();
         formData.append("question", searchText);
@@ -86,7 +91,7 @@ export default function SearchScreen(
 
         setLoading(true);
         const res = await ProcessQuery(formData);
-        setLoading(false);
+        setTimeout(() => setLoading(false), 5000);
         if (res.code == OK) {
             Notify(toast.TYPE.SUCCESS, "Rendering search results");
         } else {
@@ -97,7 +102,7 @@ export default function SearchScreen(
     }
     const handleKeyUp = async (event: any) => {
         if (event.key === 'Enter') {
-            triggerSearch();
+            await triggerSearch();
         }
     }
 
