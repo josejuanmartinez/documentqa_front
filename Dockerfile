@@ -1,8 +1,10 @@
 FROM node
 
-EXPOSE 5173
+EXPOSE 80
 
-WORKDIR /frontend
+RUN mkdir -p /usr/src/sintetic.ai/qa/front
+
+WORKDIR /usr/src/sintetic.ai/qa/front
 
 COPY . .
 

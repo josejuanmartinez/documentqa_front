@@ -79,10 +79,8 @@ export default function SearchScreen(
     const [loading, setLoading] = useState(false);
 
     const triggerSearch = async (): Promise<void> => {
-        if (loading) {
-            Notify(toast.TYPE.ERROR, "Wait!")
+        if (loading)
             return;
-        }
 
         // CALL TO API
         const formData = new FormData();
